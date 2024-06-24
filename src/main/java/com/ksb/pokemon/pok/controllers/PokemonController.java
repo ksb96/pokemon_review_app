@@ -22,42 +22,37 @@ import com.ksb.pokemon.pok.service.PokemonService;
 @RestController
 @RequestMapping("/api/")
 public class PokemonController {
-	
+
 	private PokemonService pokemonService;
-	
+
 	public PokemonController(PokemonService pokemonService) {
 		this.pokemonService = pokemonService;
 	}
 
 	@GetMapping("pokemon")
-	public ResponseEntity<List<Pokemon>> getPokemons(){
-		List<Pokemon> pokemons = new ArrayList<>();
-		//adding
-		pokemons.add(new Pokemon(1,"pikachu","electric"));
-		pokemons.add(new Pokemon(2,"charmander","fire"));
-		pokemons.add(new Pokemon(3,"squirtle","water"));
-		
-		return ResponseEntity.ok(pokemons);
+	public ResponseEntity<List<PokemonDto>> getPokemons() {
+		return new ResponseEntity<>(pokemonService.getAllPokemon(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("pokemon/{id}")
-	public Pokemon pokemonDetail(@PathVariable int id) {
-		return new Pokemon(id, "gasly", "ghost");
+	public ResponseEntity<PokemonDto> pokemonDetail(@PathVariable int id) {
+		return ResponseEntity.ok(pokemonService.getPokemonById(id));
 	}
-	
+
 	@PostMapping("pokemon/create")
 	@ResponseStatus(HttpStatus.CREATED)
-	public ResponseEntity<PokemonDto> creratePokemon(@RequestBody PokemonDto pokemonDto){
+	public ResponseEntity<PokemonDto> createPokemon(@RequestBody PokemonDto pokemonDto) {
 		return new ResponseEntity<>(pokemonService.createPokemon(pokemonDto), HttpStatus.CREATED);
 	}
-	
+
 	@PutMapping("pokemon/{id}/update")
-	public ResponseEntity<Pokemon> updatePokemon(@RequestBody Pokemon pokemon, @PathVariable("id") int pokemonId){
-		return ResponseEntity.ok(pokemon);
+	public ResponseEntity<PokemonDto> updatePokemon(@RequestBody PokemonDto pokemonDto, @PathVariable("id") int pokemonId) {
+		PokemonDto response = pokemonService.updatePokemon(pokemonDto, pokemonId);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@DeleteMapping("pokemon/{id}/delete")
-	public ResponseEntity<String> deletePokemon(@PathVariable("id") int pokemonId){
+	public ResponseEntity<String> deletePokemon(@PathVariable("id") int pokemonId) {
 		return ResponseEntity.ok("Pokemon deleted successfully");
 	}
 }
