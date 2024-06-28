@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ksb.pokemon.pok.dto.PokemonDto;
+import com.ksb.pokemon.pok.dto.PokemonResponse;
 import com.ksb.pokemon.pok.models.Pokemon;
 import com.ksb.pokemon.pok.service.PokemonService;
 
@@ -30,8 +32,11 @@ public class PokemonController {
 	}
 
 	@GetMapping("pokemon")
-	public ResponseEntity<List<PokemonDto>> getPokemons() {
-		return new ResponseEntity<>(pokemonService.getAllPokemon(), HttpStatus.OK);
+	public ResponseEntity<PokemonResponse> getPokemons(
+			@RequestParam(value = "pageNo", defaultValue = "0", required = false) int pageNo,
+			@RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize
+			) {
+		return new ResponseEntity<>(pokemonService.getAllPokemon(pageNo, pageSize), HttpStatus.OK);
 	}
 
 	@GetMapping("pokemon/{id}")
@@ -53,6 +58,7 @@ public class PokemonController {
 
 	@DeleteMapping("pokemon/{id}/delete")
 	public ResponseEntity<String> deletePokemon(@PathVariable("id") int pokemonId) {
-		return ResponseEntity.ok("Pokemon deleted successfully");
+		pokemonService.deletePokemonId(pokemonId);
+		return new ResponseEntity<>("Pokemon deleted!!", HttpStatus.OK);
 	}
 }

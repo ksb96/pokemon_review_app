@@ -4,9 +4,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+
 import org.springframework.stereotype.Service;
 
 import com.ksb.pokemon.pok.dto.PokemonDto;
+import com.ksb.pokemon.pok.dto.PokemonResponse;
 import com.ksb.pokemon.pok.exception.PokemonNotFoundException;
 import com.ksb.pokemon.pok.models.Pokemon;
 import com.ksb.pokemon.pok.repository.PokemonRepository;
@@ -40,9 +46,23 @@ public class PokemonServiceImpl implements PokemonService {
 
 	@Override
 	// GET ALL
-	public List<PokemonDto> getAllPokemon() {
-		List<Pokemon> pokemon = pokemonRepository.findAll();
-		return pokemon.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
+	public PokemonResponse getAllPokemon(int pageNo, int pageSize) {
+
+		Pageable pageable = PageRequest.of(pageNo, pageSize);
+
+		Page<Pokemon> pokemons = pokemonRepository.findAll(pageable);
+		List<Pokemon> listOfPokemon = pokemons.getContent();
+		List<PokemonDto> content = listOfPokemon.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
+	
+		PokemonResponse pokemonResponse = new PokemonResponse();
+		pokemonResponse.setContent(content);
+        pokemonResponse.setPageNo(pokemons.getNumber());
+        pokemonResponse.setPageSize(pokemons.getSize());
+        pokemonResponse.setTotalElements(pokemons.getTotalElements());
+        pokemonResponse.setTotalPages(pokemons.getTotalPages());
+        pokemonResponse.setLast(pokemons.isLast());
+        
+        return pokemonResponse;
 	}
 
 	private PokemonDto mapToDto(Pokemon pokemon) {
@@ -81,6 +101,14 @@ public class PokemonServiceImpl implements PokemonService {
 		Pokemon updatePokemon = pokemonRepository.save(pokemon);
 
 		return mapToDto(updatePokemon);
+	}
+
+	@Override
+	public void deletePokemonId(int id) {
+		Pokemon pokemon = pokemonRepository.findById(id)
+				.orElseThrow(() -> new PokemonNotFoundException("Pokemon not found, so it cannot be deleted!!"));
+		pokemonRepository.delete(pokemon);
+
 	}
 
 }
