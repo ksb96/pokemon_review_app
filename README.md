@@ -1,2 +1,2 @@
 # pokemon_review_app
-basic api creation using springboot
+basic RESTapi creation using springboot
