@@ -1,7 +1,5 @@
 package com.ksb.pokemon.pok.service;
 
-import java.util.List;
-
 import com.ksb.pokemon.pok.dto.PokemonDto;
 import com.ksb.pokemon.pok.dto.PokemonResponse;
 
